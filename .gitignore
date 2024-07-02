@@ -1,4 +1,5 @@
 node_modules
+/dist
 
 .env
 .env.test
@@ -7,4 +8,4 @@ node_modules
 keys
 
 # db
-postgres
+/postgres
