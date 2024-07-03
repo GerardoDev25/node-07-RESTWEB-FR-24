@@ -1,29 +1,25 @@
 import { Request, Response } from 'express';
 import { prisma } from '../../data/postgres';
 import { CreateTodoDto, UpdateTodoDto } from '../../domain/dtos/';
+import { TodoRepository } from '../../domain/repositories/todo.repository';
 
 export class TodosController {
-  constructor() {}
+  constructor(private readonly todoRepository: TodoRepository) {}
 
   getTodos = async (req: Request, res: Response) => {
-    const todos = await prisma.todo.findMany();
-
+    const todos = await this.todoRepository.getAll();
     return res.json(todos);
   };
 
   getTodosById = async (req: Request, res: Response) => {
     const id = +req.params.id;
-    if (isNaN(id)) {
-      return res.status(400).json(`id: "${id}" not valid`);
+    try {
+      const todo = await this.todoRepository.findById(id);
+      return res.json(todo);
+    } catch (error) {
+      console.log(error);
+      return res.status(400).json(`${error}`);
     }
-
-    const todo = await prisma.todo.findFirst({ where: { id } });
-
-    if (!todo) {
-      throw new Error(`todo with id: "${id}" not found`);
-    }
-
-    return res.json(todo);
   };
 
   createTodo = async (req: Request, res: Response) => {
@@ -32,7 +28,8 @@ export class TodosController {
     if (error) {
       return res.status(400).json({ message: error });
     }
-    const newTodo = await prisma.todo.create({ data: createTodoDto! });
+
+    const newTodo = await this.todoRepository.create(createTodoDto!);
     return res.status(201).json(newTodo);
   };
 
@@ -45,37 +42,25 @@ export class TodosController {
       return res.status(400).json({ message: error });
     }
 
-    const todoToUpdate = await prisma.todo.findFirst({ where: { id } });
+    try {
+      const todoToUpdate = await this.todoRepository.updateById(updateTodoDto!);
 
-    if (!todoToUpdate) {
-      throw new Error(`todo with id: "${id}" not found`);
+      return res.status(200).json(todoToUpdate);
+    } catch (error) {
+      console.log(error);
+      return res.status(400).json(`${error}`);
     }
-
-    const updatedTodo = await prisma.todo.update({
-      where: { id },
-      data: updateTodoDto!.values,
-    });
-
-    return res.status(201).json(updatedTodo);
   };
 
   deleteTodo = async (req: Request, res: Response) => {
     const id = +req.params.id;
 
-    if (isNaN(id)) {
-      return res.status(400).json({ message: `id: "${id}" not valid` });
+    try {
+      const deletedTodo = await this.todoRepository.deleteById(id);
+      return res.status(200).json(deletedTodo);
+    } catch (error) {
+      console.log(error);
+      return res.status(400).json(`${error}`);
     }
-
-    const todoToDelete = await prisma.todo.findFirst({ where: { id } });
-
-    if (!todoToDelete) {
-      throw new Error(`todo with id: "${id}" not found`);
-    }
-
-    const deletedTodo = await prisma.todo.delete({ where: { id: Number(id) } });
-
-    return deletedTodo
-      ? res.status(201).json({ deletedTodo })
-      : res.status(400).json({ error: `todo with id ${id} not found` });
   };
 }
