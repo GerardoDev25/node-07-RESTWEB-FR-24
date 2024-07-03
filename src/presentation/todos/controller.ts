@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
-import { prisma } from '../../data/postgres';
-import { CreateTodoDto, UpdateTodoDto } from '../../domain/dtos/';
-import { TodoRepository } from '../../domain/repositories/todo.repository';
+import { CreateTodoDto, UpdateTodoDto } from '../../domain/dtos';
+import { TodoRepository } from '../../domain/repositories';
 
 export class TodosController {
   constructor(private readonly todoRepository: TodoRepository) {}
@@ -42,25 +41,24 @@ export class TodosController {
       return res.status(400).json({ message: error });
     }
 
-    try {
-      const todoToUpdate = await this.todoRepository.updateById(updateTodoDto!);
-
-      return res.status(200).json(todoToUpdate);
-    } catch (error) {
-      console.log(error);
-      return res.status(400).json(`${error}`);
-    }
+    // try {
+    const todoToUpdate = await this.todoRepository.updateById(updateTodoDto!);
+    return res.status(200).json(todoToUpdate);
+    // } catch (error) {
+    //   console.log(error);
+    //   return res.status(400).json(`${error}`);
+    // }
   };
 
   deleteTodo = async (req: Request, res: Response) => {
     const id = +req.params.id;
 
-    try {
-      const deletedTodo = await this.todoRepository.deleteById(id);
-      return res.status(200).json(deletedTodo);
-    } catch (error) {
-      console.log(error);
-      return res.status(400).json(`${error}`);
-    }
+    // try {
+    const deletedTodo = await this.todoRepository.deleteById(id);
+    return res.status(200).json(deletedTodo);
+    // } catch (error) {
+    //   console.log(error);
+    //   return res.status(400).json(`${error}`);
+    // }
   };
 }
