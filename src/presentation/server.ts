@@ -1,6 +1,6 @@
-import express, { Router } from 'express';
 import path from 'node:path';
-import { AppRouter } from './routes';
+import express, { Router } from 'express';
+import compression from 'compression'
 
 interface Options {
   port: number;
@@ -23,6 +23,7 @@ export class Server {
   async start() {
     // * middlewares
     this.app.use(express.json());
+    this.app.use(compression());
     this.app.use(express.urlencoded({ extended: true }));
 
     // * public folder
