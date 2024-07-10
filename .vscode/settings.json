@@ -7,6 +7,7 @@
     "todos"
   ],
   "conventionalCommits.scopes": [
-    "dev"
+    "dev",
+    "test"
   ]
 }
