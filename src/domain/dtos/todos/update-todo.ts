@@ -37,6 +37,6 @@ export class UpdateTodoDto {
         return ['text property must be a string', undefined];
     }
 
-    return [undefined, new UpdateTodoDto(id, text, completedAt)];
+    return [undefined, new UpdateTodoDto(id, text, newCompletedAt)];
   }
 }
