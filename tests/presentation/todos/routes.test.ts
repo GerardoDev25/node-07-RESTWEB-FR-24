@@ -57,10 +57,10 @@ describe('todo route testing', () => {
 
     const { body } = await request(testServer.app)
       .get(`/api/todos/${todoId}`)
-      .expect(400);
+      .expect(404);
 
     // console.log({ body });
-    expect(body).toEqual({ error: `Error: todo with id: ${todoId} not found` });
+    expect(body).toEqual({ error: `todo with id: ${todoId} not found` });
   });
 
   // * create todo
@@ -120,7 +120,7 @@ describe('todo route testing', () => {
       .send({ text: 'updated todo', completedAt: '2023-12-12' })
       .expect(404);
 
-    expect(body).toEqual({ error: 'Error: todo with id: 999 not found' });
+    expect(body).toEqual({ error: 'todo with id: 999 not found' });
   });
 
   test('should return an update todo only the date', async () => {
@@ -151,8 +151,8 @@ describe('todo route testing', () => {
   test('should return 404 if todo not exit api/todos/:id', async () => {
     const { body } = await request(testServer.app)
       .delete(`/api/todos/999`)
-      .expect(400);
+      .expect(404);
 
-    expect(body).toEqual({ error: 'Error: todo with id: 999 not found' });
+    expect(body).toEqual({ error: 'todo with id: 999 not found' });
   });
 });

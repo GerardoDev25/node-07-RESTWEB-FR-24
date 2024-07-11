@@ -8,15 +8,25 @@ import {
   DeleteTodo,
   UpdateTodo,
 } from '../../domain/use-cases/todo';
+import { CustomError } from '../../domain/error';
 
 export class TodosController {
   constructor(private readonly todoRepository: TodoRepository) {}
+
+  private handleError = (res: Response, error: unknown) => {
+    if (error instanceof CustomError) {
+      return res.status(error.statusCode).json({ error: error.message });
+    }
+    return res
+      .status(500)
+      .json({ error: `Internal server error - check Logs}` });
+  };
 
   getTodos = (req: Request, res: Response) => {
     new GetTodos(this.todoRepository)
       .execute()
       .then((todos) => res.status(200).json(todos))
-      .catch((error) => res.status(400).json({ error: `${error}` }));
+      .catch((error) => this.handleError(res, error));
   };
 
   getTodosById = (req: Request, res: Response) => {
@@ -24,7 +34,7 @@ export class TodosController {
     new GetTodoById(this.todoRepository)
       .execute(id)
       .then((todo) => res.status(200).json(todo))
-      .catch((error) => res.status(400).json({ error: `${error}` }));
+      .catch((error) => this.handleError(res, error));
   };
 
   createTodo = (req: Request, res: Response) => {
@@ -36,7 +46,7 @@ export class TodosController {
     new CreateTodo(this.todoRepository)
       .execute(createTodoDto!)
       .then((todo) => res.status(201).json(todo))
-      .catch((error) => res.status(400).json({ error: `${error}` }));
+      .catch((error) => this.handleError(res, error));
   };
 
   updateTodo = (req: Request, res: Response) => {
@@ -50,7 +60,7 @@ export class TodosController {
     new UpdateTodo(this.todoRepository)
       .execute(updateTodoDto!)
       .then((todo) => res.status(200).json(todo))
-      .catch((error) => res.status(404).json({ error: `${error}` }));
+      .catch((error) => this.handleError(res, error));
   };
 
   deleteTodo = (req: Request, res: Response) => {
@@ -59,6 +69,6 @@ export class TodosController {
     new DeleteTodo(this.todoRepository)
       .execute(id)
       .then((todo) => res.status(200).json(todo))
-      .catch((error) => res.status(400).json({ error: `${error}` }));
+      .catch((error) => this.handleError(res, error));
   };
 }
