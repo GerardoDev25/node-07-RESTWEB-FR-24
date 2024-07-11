@@ -1,6 +1,6 @@
 import path from 'node:path';
 import express, { Router } from 'express';
-import compression from 'compression'
+import compression from 'compression';
 
 interface Options {
   port: number;
@@ -9,7 +9,8 @@ interface Options {
 }
 
 export class Server {
-  private app = express();
+  public readonly app = express();
+  private serverListener: any;
 
   private readonly port: number;
   private readonly publicPath: string;
@@ -41,8 +42,11 @@ export class Server {
       return res.sendFile(indexPath);
     });
 
-    this.app.listen(this.port, () => {
+    this.serverListener = this.app.listen(this.port, () => {
       console.log('Server on port 3000');
     });
+  }
+  public close() {
+    this.serverListener?.close();
   }
 }
